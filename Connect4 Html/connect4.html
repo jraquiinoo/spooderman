@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href='bower_components/materialize/dist/css/materialize.min.css' rel='stylesheet' type='text/css'>
+		<style>
+			.invisible{
+				opacity: 0;
+			}
+			
+			@media(max-height: 600px){
+				.column{
+					height: 80vh;
+					opacity: 0.7;
+					position: relative;
+					cursor: pointer;
+					display: inline-block;
+					width: 14.28%;
+					margin:0px;
+					padding:0px;
+				}
+			}
+			
+			@media(min-height: 601px){
+				.column{
+					height: 70vh;
+					opacity: 0.7;
+					position: relative;
+					cursor: pointer;
+					display: inline-block;
+					width: 14.28%;
+					margin:0px;
+					padding:0px;
+				}
+			}
+			
+			#game-screen, #main-menu{
+				width: 100vw;
+			}
+			
+			.column:nth-child(even){
+				background-color: #E3E3E3;
+			}
+			
+			.column:nth-child(odd){
+				background-color: #EEEEEE;
+			}
+			
+			#game-board{
+				border: 1px solid #CCCCCC;
+				padding:5px;
+				border-radius:3px;
+				border-style: dashed;
+			}
+			
+			.ball{
+				border-radius: 100%;
+				position: absolute;
+				bottom: 0px;
+				left: 3px;
+			}
+			
+			.column:hover{
+				background-color: #DEDEDE;
+			}
+			
+			.hidden{
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id='main-menu' style='position: relative;'>
+			<div class='container'>
+				<div class='row' style='margin-bottom:100px;'>
+					<div class='col s12 center'>
+						<h1><span style='color: #33b5e5'>Connect</span><span style='color:gray;font-style:italic;'>4</span></h1>
+					</div>
+				</div>
+				<div id='form' class='invisible'>
+					<div class='row'>
+						<div class='col s12 m5' style='margin-bottom:10px;'>
+							<label for="player1">Player 1</label>
+							<input id="player1" type="text"/>
+						</div>
+						<div class='col s12 m2 center'>
+							<span style='font-style:italic;font-size:2em;color:gray;'>VS.</span>
+						</div>
+						<div class='col s12 m5'>
+							<label for="player2">Player 2</label>
+							<input id="player2" type="text"/>
+						</div>
+					</div>
+					<div class='row center'>
+						<a id='play-btn' href="#" class='btn-floating btn-large blue lighten-1 waves-effect'><i class='mdi-av-play-arrow'></i></a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id='game-screen' class='hidden' style='position: absolute; top:0px;'>
+			<div class='container'>
+				<div style='position: relative; top:0px;width:100%;'>
+					<div class='row'>
+						<div class='col s12'>
+							<h3 id='board-header' class='center'></h3>
+						</div>
+						<div class='col s12 m2'>
+							<div class='row'>
+								<h3 id='player1-name' class='col s6 m12'></h3>
+								<h3 id='player1-score' class='col s6 m12 grey-text'>0</h3>
+							</div>
+						</div>
+						<div class='col s12 m8' id='game-board'>
+							<div class='column' data-col=0></div><!--
+							--><div class='column' data-col=1></div><!--
+							--><div class='column' data-col=2></div><!--
+							--><div class='column' data-col=3></div><!--
+							--><div class='column' data-col=4></div><!--
+							--><div class='column' data-col=5></div><!--
+							--><div class='column' data-col=6></div>
+						</div>
+						<div class='col s12 m2'>
+							<div class='row'>
+								<h3 id='player2-name' class='col s6 m12 right'></h3>
+								<h3 id='player2-score' class='col s6 m12 grey-text right'>0</h3>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div id="buttons" class="col s12 hidden center-align">
+							<div id="action-rematch" class="btn waves-effect">Rematch</div>
+							<div id="action-quit" class="btn waves-effect grey lighten-3 grey-text text-darken-2">Quit</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src='bower_components/jquery/dist/jquery.min.js'></script>
+		<script src='bower_components/materialize/dist/js/materialize.min.js'></script>
+		<script src="bower_components/jqueryui/jquery-ui.js"></script>
+		<script src="bower_components/bounce.js/bounce.min.js"></script>
+		<script src="logic.js"></script>
+		<script>
+			$(document).ready(function(){
+				var left = $("#main-menu").position().left + parseInt($("#main-menu").css("width").replace("px","")) + 20;
+				$("#game-screen").css({
+					left: left + "px"
+				});
+				var top = ($("body").css("height").replace("px", "") / 2);
+				$("#main-menu").css("top", top+"px");
+				$("#main-menu").animate({
+					opacity: 1
+				}, 500, function(){
+					$("#main-menu").animate({
+						top: 0
+					}, 1000, "easeInOutQuart", function(){
+						$("#form").animate({
+							opacity: 1
+						});
+					});
+				});
+			});
+			
+			$(".btn").mouseenter(function(){
+				$(this).animate({opacity: "1"}, 200);
+			});
+			
+			$(".btn").mouseleave(function(){
+				$(this).animate({opacity: "0.7"}, 200);
+			});
+			
+			$("#play-btn").click(function(){
+				var isValid = true;
+				if(!$("#player1").val()){
+					toast('You should enter a name for player 1!', 3000, 'rounded red white-text');
+					isValid = false;
+				}
+				if(!$("#player2").val()){
+					toast('You should enter a name for player 2!', 3000, 'rounded red white-text');
+					isValid = false;
+				} 
+				if (isValid){
+					init();
+					$("#player1-name").text($("#player1").val());
+					$("#player1-name").addClass(playerColor[0] + "-text text-darken-2");
+					$("#player2-name").text($("#player2").val());
+					$("#player2-name").addClass(playerColor[1] + "-text text-darken-2");
+					playerName.push($("#player1").val());
+					playerName.push($("#player2").val());
+					$("#board-header").text(playerName[currentTurn] + "'s turn");
+					var boardLeft = ($("body").css("width").replace("px","")/2) - ($("#game-screen").css("width").replace("px","")/2);
+					$("#main-menu").animate({
+						left: "-=600",
+						opacity: "hide"
+					}, 1000, "easeInOutCubic");
+					$("#game-screen").animate({
+						left: boardLeft,
+						opacity: "show"
+					}, 1000, "easeInOutCubic");
+				}
+			});
+		</script>
+	</body>
+</html>
